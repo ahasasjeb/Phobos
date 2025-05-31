@@ -4,6 +4,7 @@
 #include <BuildingClass.h>
 #include <HouseClass.h>
 #include <ScenarioClass.h>
+#include <ThemeClass.h>
 
 #include <Utilities/EnumFunctions.h>
 #include <Utilities/GeneralUtils.h>
@@ -17,7 +18,10 @@
 
 void SWTypeExt::FireSuperWeaponExt(SuperClass* pSW, const CellStruct& cell)
 {
-	auto const pTypeExt = SWTypeExt::ExtMap.Find(pSW->Type);
+        auto const pTypeExt = SWTypeExt::ExtMap.Find(pSW->Type);
+
+        if(pTypeExt->LaunchTheme >= 0)
+                ThemeClass::Instance.Play(pTypeExt->LaunchTheme);
 
 	if (pTypeExt->LimboDelivery_Types.size() > 0)
 		pTypeExt->ApplyLimboDelivery(pSW->Owner);

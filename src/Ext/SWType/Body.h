@@ -56,7 +56,9 @@ public:
 		Valueable<bool> SW_Next_IgnoreDesignators;
 		ValueableVector<float> SW_Next_RollChances;
 
-		Valueable<int> ShowTimer_Priority;
+                Valueable<int> ShowTimer_Priority;
+
+                Valueable<int> LaunchTheme;
 
 		Valueable<WarheadTypeClass*> Detonate_Warhead;
 		Valueable<WeaponTypeClass*> Detonate_Weapon;
@@ -118,10 +120,11 @@ public:
 			, SW_Next_IgnoreInhibitors { false }
 			, SW_Next_IgnoreDesignators { true }
 			, SW_Next_RollChances {}
-			, SW_Next_RandomWeightsData {}
-			, ShowTimer_Priority { 0 }
-			, Convert_Pairs {}
-			, ShowDesignatorRange { true }
+                        , SW_Next_RandomWeightsData {}
+                        , ShowTimer_Priority { 0 }
+                        , LaunchTheme { -1 }
+                        , Convert_Pairs {}
+                        , ShowDesignatorRange { true }
 			, TabIndex { 1 }
 			, UseWeeds { false }
 			, UseWeeds_Amount { RulesClass::Instance->WeedCapacity }
