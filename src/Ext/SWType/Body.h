@@ -56,7 +56,8 @@ public:
 		Valueable<bool> SW_Next_IgnoreDesignators;
 		ValueableVector<float> SW_Next_RollChances;
 
-		Valueable<int> ShowTimer_Priority;
+                Valueable<int> ShowTimer_Priority;
+                Valueable<int> PlayTheme;
 
 		Valueable<WarheadTypeClass*> Detonate_Warhead;
 		Valueable<WeaponTypeClass*> Detonate_Weapon;
@@ -119,7 +120,8 @@ public:
 			, SW_Next_IgnoreDesignators { true }
 			, SW_Next_RollChances {}
 			, SW_Next_RandomWeightsData {}
-			, ShowTimer_Priority { 0 }
+                        , ShowTimer_Priority { 0 }
+                        , PlayTheme { -1 }
 			, Convert_Pairs {}
 			, ShowDesignatorRange { true }
 			, TabIndex { 1 }

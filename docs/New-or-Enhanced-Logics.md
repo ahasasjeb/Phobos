@@ -1032,6 +1032,16 @@ In `rulesmd.ini`:
 TabIndex=1  ; integer
 ```
 
+### SuperWeapon theme playback
+
+- `PlayTheme` can be used to specify a soundtrack theme that will start playing when the Super Weapon is fired.
+
+In `rulesmd.ini`:
+```ini
+[SOMESW]    ; SuperWeaponType
+PlayTheme=  ; Soundtrack theme ID
+```
+
 ### EMPulse settings
 
 - It is possible to customize which weapon a building with `EMPulseCannon=true` fires when an associated `Type=EMPulse` superweapon (**only** if `EMPulse.TargetSelf=false` or omitted) is fired by setting `EMPulse.WeaponIndex`.

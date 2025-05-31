@@ -429,6 +429,7 @@ New:
 - Custom `SlavesFreeSound` (by TwinkleStar)
 - Allows jumpjet to crash without rotation (by TwinkleStar)
 - Customizable priority of superweapons timer sorting(by ststl)
+- SuperWeapon theme playback on firing (by Codex)
 - Customizable aircraft spawner spawn delay (by Starkku)
 - Customizable `Cluster` scatter distance (by Starkku)
 - Customizable `FlakScatter` distance (by Starkku)

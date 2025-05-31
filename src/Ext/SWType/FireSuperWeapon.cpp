@@ -4,6 +4,7 @@
 #include <BuildingClass.h>
 #include <HouseClass.h>
 #include <ScenarioClass.h>
+#include <ThemeClass.h>
 
 #include <Utilities/EnumFunctions.h>
 #include <Utilities/GeneralUtils.h>
@@ -34,8 +35,11 @@ void SWTypeExt::FireSuperWeaponExt(SuperClass* pSW, const CellStruct& cell)
 	if (pTypeExt->Convert_Pairs.size() > 0)
 		pTypeExt->ApplyTypeConversion(pSW);
 
-	if (static_cast<int>(pSW->Type->Type) == 28 && !pTypeExt->EMPulse_TargetSelf) // Ares' Type=EMPulse SW
-		pTypeExt->HandleEMPulseLaunch(pSW, cell);
+        if (static_cast<int>(pSW->Type->Type) == 28 && !pTypeExt->EMPulse_TargetSelf) // Ares' Type=EMPulse SW
+                pTypeExt->HandleEMPulseLaunch(pSW, cell);
+
+        if (pTypeExt->PlayTheme >= 0)
+                ThemeClass::Instance.Play(pTypeExt->PlayTheme);
 
 	auto& sw_ext = HouseExt::ExtMap.Find(pSW->Owner)->SuperExts[pSW->Type->ArrayIndex];
 	sw_ext.ShotCount++;
