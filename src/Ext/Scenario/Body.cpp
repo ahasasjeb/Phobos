@@ -4,6 +4,7 @@
 #include <VeinholeMonsterClass.h>
 #include <HouseClass.h>
 #include <ThemeClass.h>
+#include <Utilities/EnumFunctions.h>
 #include <Ext/House/Body.h>
 #include <Ext/SWType/Body.h>
 
@@ -115,6 +116,87 @@ void ScenarioExt::ExtData::UpdateTransportReloaders()
 
 		if (pTechno->IsAlive && pTechno->Transporter && pTechno->Transporter->IsInLogic)
 			pTechno->Reload();
+	}
+}
+
+void ScenarioExt::ExtData::RegisterActiveSWMusic(HouseClass* house, HouseExt::ExtData::SWExt* sw, int configuredTheme, AffectedHouse affected)
+{
+	if (!house || !sw || configuredTheme < 0) { return; }
+	
+	for (const auto& e : this->ActiveSWMusicEntries)
+	{
+		if (e.House == house && e.SW == sw)
+			return;
+	}
+	
+	this->ActiveSWMusicEntries.emplace_back(house, sw, configuredTheme, affected);
+}
+
+void ScenarioExt::ExtData::UpdateActiveSWMusic()
+{
+	if (this->ActiveSWMusicEntries.empty()) 
+		return;
+
+	for (auto it = this->ActiveSWMusicEntries.begin(); it != this->ActiveSWMusicEntries.end(); )
+	{
+		const auto& entry = *it;
+		
+		if (!entry.House || !entry.SW || !entry.SW->MusicActive)
+		{
+			it = this->ActiveSWMusicEntries.erase(it);
+			continue;
+		}
+		
+		if (entry.SW->MusicTimer.Completed())
+		{
+			if (entry.ConfiguredTheme >= 0 && 
+				ThemeClass::Instance.CurrentTheme == entry.ConfiguredTheme &&
+				EnumFunctions::CanTargetHouse(entry.Affected, entry.House, HouseClass::CurrentPlayer))
+			{
+				ThemeClass::Instance.Stop();
+			}
+			
+			entry.SW->MusicTimer.Stop();
+			entry.SW->MusicActive = false;
+			it = this->ActiveSWMusicEntries.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+}
+
+void ScenarioExt::ExtData::RebuildActiveSWMusic()
+{
+	this->ActiveSWMusicEntries.clear();
+	
+	for (const auto pHouse : HouseClass::Array)
+	{
+		if (!pHouse) 
+			continue;
+			
+		auto& houseExt = *HouseExt::ExtMap.Find(pHouse);
+		const int superCount = pHouse->Supers.Count;
+		
+		for (size_t i = 0; i < houseExt.SuperExts.size() && static_cast<int>(i) < superCount; ++i)
+		{
+			auto& swExt = houseExt.SuperExts[i];
+			if (!swExt.MusicActive)
+				continue;
+				
+			const auto* pSuper = pHouse->Supers[static_cast<int>(i)];
+			if (!pSuper || !pSuper->Type)
+				continue;
+				
+			const auto* pTypeExt = SWTypeExt::ExtMap.Find(pSuper->Type);
+			const int configuredTheme = pTypeExt->Music_Theme.Get();
+			
+			if (configuredTheme >= 0)
+			{
+				this->ActiveSWMusicEntries.emplace_back(pHouse, &swExt, configuredTheme, pTypeExt->Music_AffectedHouses.Get());
+			}
+		}
 	}
 }
 
@@ -235,6 +317,8 @@ DEFINE_HOOK(0x689669, ScenarioClass_Load_Suffix, 0x6)
 			buffer->LoadFromStream(Reader);
 	}
 
+	// rebuild active SW music list after loading
+	ScenarioExt::Global()->RebuildActiveSWMusic();
 	return 0;
 }
 
@@ -269,46 +353,8 @@ DEFINE_HOOK(0x55B4E1, LogicClass_Update_BeforeAll, 0x5)
 	ScenarioExt::Global()->UpdateAutoDeathObjectsInLimbo();
 	ScenarioExt::Global()->UpdateTransportReloaders();
 
-	// SW music timers: stop music when timer completes
-	for (auto const pHouse : HouseClass::Array)
-	{
-		if (!pHouse) { continue; }
-		auto& houseExt = *HouseExt::ExtMap.Find(pHouse);
-		for (size_t i = 0; i < houseExt.SuperExts.size(); ++i)
-		{
-			auto& swExt = houseExt.SuperExts[i];
-			if (swExt.MusicActive && swExt.MusicTimer.Completed())
-			{
-				int configuredTheme = -1;
-				SuperClass* pSuper = nullptr;
-				SWTypeExt::ExtData* pTypeExt = nullptr;
-				if (pHouse->Supers.Count > static_cast<int>(i))
-				{
-					pSuper = pHouse->Supers[static_cast<int>(i)];
-					if (pSuper && pSuper->Type)
-					{
-						pTypeExt = SWTypeExt::ExtMap.Find(pSuper->Type);
-						configuredTheme = pTypeExt->Music_Theme.Get();
-					}
-				}
-				if (configuredTheme >= 0 && ThemeClass::Instance.CurrentTheme == configuredTheme)
-				{
-					// stop only if same theme and local house is affected
-					AffectedHouse affected = AffectedHouse::All;
-					if (pTypeExt)
-					{
-						affected = pTypeExt->Music_AffectedHouses.Get();
-					}
-					if (EnumFunctions::CanTargetHouse(affected, pHouse, HouseClass::CurrentPlayer))
-					{
-						ThemeClass::Instance.Stop();
-					}
-				}
-				swExt.MusicTimer.Stop();
-				swExt.MusicActive = false;
-			}
-		}
-	}
+	// SW music timers: only check active entries
+	ScenarioExt::Global()->UpdateActiveSWMusic();
 
 	return 0;
 }

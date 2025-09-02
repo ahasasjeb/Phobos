@@ -8,6 +8,8 @@
 #include <Utilities/TemplateDef.h>
 
 #include <Ext/Techno/Body.h>
+#include <Ext/House/Body.h>
+#include <New/Type/Affiliated/TypeConvertGroup.h>
 
 #include <map>
 
@@ -77,9 +79,24 @@ public:
 
 		void UpdateAutoDeathObjectsInLimbo();
 		void UpdateTransportReloaders();
+
+		// Active SW music tracking to avoid per-frame full scan
+		struct ActiveSWMusicEntry
+		{
+			HouseClass* House;
+			HouseExt::ExtData::SWExt* SW;
+			int ConfiguredTheme;
+			AffectedHouse Affected;
+		};
+
+		void RegisterActiveSWMusic(HouseClass* house, HouseExt::ExtData::SWExt* sw, int configuredTheme, AffectedHouse affected);
+		void UpdateActiveSWMusic();
+		void RebuildActiveSWMusic();
 	private:
 		template <typename T>
 		void Serialize(T& Stm);
+
+		std::vector<ActiveSWMusicEntry> ActiveSWMusicEntries;
 	};
 
 private:

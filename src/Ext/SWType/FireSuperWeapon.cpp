@@ -61,6 +61,7 @@ void SWTypeExt::FireSuperWeaponExt(SuperClass* pSW, const CellStruct& cell)
 		{
 			sw_ext.MusicTimer.Start(duration);
 			sw_ext.MusicActive = true;
+			ScenarioExt::Global()->RegisterActiveSWMusic(pHouse, &sw_ext, pTypeExt->Music_Theme.Get(), affected);
 		}
 	}
 
