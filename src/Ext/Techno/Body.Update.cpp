@@ -9,6 +9,8 @@
 #include <Kamikaze.h>
 #include <JumpjetLocomotionClass.h>
 #include <FlyLocomotionClass.h>
+#include <BuildingClass.h>
+#include <FactoryClass.h>
 
 #include <Ext/Anim/Body.h>
 #include <Ext/Bullet/Body.h>
@@ -18,6 +20,9 @@
 #include <Utilities/EnumFunctions.h>
 #include <Utilities/AresFunctions.h>
 
+
+// Forward declaration for use in OnEarlyUpdate
+static inline void PauseAIFactoryProductionIfDisabled(TechnoClass* pThis);
 
 // TechnoClass_AI_0x6F9E50
 // It's not recommended to do anything more here it could have a better place for performance consideration
@@ -40,6 +45,12 @@ void TechnoExt::ExtData::OnEarlyUpdate()
 	this->EatPassengers();
 	this->ApplySpawnLimitRange();
 	this->ApplyMindControlRangeLimit();
+
+	// 如果建筑为AI且处于EMP/停用，暂停工厂生产计时
+	if (this->OwnerObject()->Deactivated || this->OwnerObject()->IsUnderEMP())
+	{
+		PauseAIFactoryProductionIfDisabled(this->OwnerObject());
+	}
 }
 
 void TechnoExt::ExtData::ApplyInterceptor()
@@ -1256,6 +1267,24 @@ void TechnoExt::ExtData::ApplyMindControlRangeLimit()
 			pCapturer->CaptureManager->FreeUnit(pThis);
 		}
 	}
+}
+
+// Pause building factory production under EMP / Deactivated (AI only)
+static inline void PauseAIFactoryProductionIfDisabled(TechnoClass* pThis)
+{
+    if (auto const pBuilding = abstract_cast<BuildingClass*>(pThis))
+    {
+        if (pBuilding->Owner && !pBuilding->Owner->IsControlledByHuman())
+        {
+            if (auto const pFactory = pBuilding->Factory)
+            {
+                if (pFactory->Production.Timer.InProgress())
+                {
+                    pFactory->Production.Timer.StartTime++;
+                }
+            }
+        }
+    }
 }
 
 void TechnoExt::KillSelf(TechnoClass* pThis, AutoDeathBehavior deathOption, AnimTypeClass* pVanishAnimation, bool isInLimbo)

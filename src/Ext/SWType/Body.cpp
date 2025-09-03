@@ -35,6 +35,10 @@ void SWTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->LimboKill_Affected)
 		.Process(this->LimboKill_IDs)
 		.Process(this->RandomBuffer)
+		// music control
+		.Process(this->Music_Theme)
+		.Process(this->Music_Duration)
+		.Process(this->Music_AffectedHouses)
 		.Process(this->Detonate_Warhead)
 		.Process(this->Detonate_Weapon)
 		.Process(this->Detonate_Damage)
@@ -84,6 +88,11 @@ void SWTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	this->SW_PostDependent.Read(exINI, pSection, "SW.PostDependent");
 	this->SW_MaxCount.Read(exINI, pSection, "SW.MaxCount");
 	this->SW_Shots.Read(exINI, pSection, "SW.Shots");
+
+	// music control
+	this->Music_Theme = pINI->ReadTheme(pSection, "Music.Theme", this->Music_Theme);
+	this->Music_Duration.Read(exINI, pSection, "Music.Duration");
+	this->Music_AffectedHouses.Read(exINI, pSection, "Music.AffectedHouses");
 
 	this->UIDescription.Read(exINI, pSection, "UIDescription");
 	this->CameoPriority.Read(exINI, pSection, "CameoPriority");

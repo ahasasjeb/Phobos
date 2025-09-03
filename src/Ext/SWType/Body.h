@@ -48,6 +48,9 @@ public:
 		Valueable<AffectedHouse> LimboKill_Affected;
 		ValueableVector<int> LimboKill_IDs;
 		Valueable<double> RandomBuffer;
+		Valueable<int> Music_Theme;
+		Valueable<int> Music_Duration;
+		Valueable<AffectedHouse> Music_AffectedHouses;
 		ValueableIdxVector<SuperWeaponTypeClass> SW_Next;
 		Valueable<bool> SW_Next_RealLaunch;
 		Valueable<bool> SW_Next_IgnoreInhibitors;
@@ -128,6 +131,9 @@ public:
 			, EMPulse_SuspendOthers { false }
 			, EMPulse_Cannons {}
 			, EMPulse_TargetSelf { false }
+			, Music_Theme { -1 }
+			, Music_Duration { 0 }
+			, Music_AffectedHouses { AffectedHouse::All }
 		{ }
 
 		// Ares 0.A functions
